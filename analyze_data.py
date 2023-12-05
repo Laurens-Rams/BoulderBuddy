@@ -1,6 +1,6 @@
 import json
 import pygame
-
+import cv2
 
 from OpenGL.GL import *
 from OpenGL.GLUT import *
@@ -11,9 +11,9 @@ from math import sqrt
 
 
 # Global scale factor for the joint positions
-SCALE_FACTOR = 0.02
-HIP_TRAIL_LENGTH = 121  # Number of frames to remember and display
-TRAIL_SPHERE_SIZE = 0.02
+SCALE_FACTOR = 0.03
+HIP_TRAIL_LENGTH = 664  # Number of frames to remember and display
+TRAIL_SPHERE_SIZE = 0.01
 SPEED_THRESHOLD = 0.008
 def read_json(file_path):
     with open(file_path, 'r') as f:
@@ -104,45 +104,48 @@ def draw_holds(holds, color):
 def main():
     json_file_path = '/Users/laurensart/Dropbox/Laurens/Move-One-Import/output.json'
     joints_names = [
-    "mixamorig:Hips",
-    "mixamorig:Spine",
-    "mixamorig:Spine1",
-    "mixamorig:Spine2",
-    "mixamorig:Neck",
-    "mixamorig:Head",
-    "mixamorig:LeftShoulder",
-    "mixamorig:LeftArm",
-    "mixamorig:LeftForeArm",
-    "mixamorig:LeftHand",
-    "mixamorig:RightShoulder",
-    "mixamorig:RightArm",
-    "mixamorig:RightForeArm",
-    "mixamorig:RightHand",
-    "mixamorig:LeftUpLeg",
-    "mixamorig:LeftLeg",
-    "mixamorig:LeftFoot",
-    "mixamorig:RightUpLeg",
-    "mixamorig:RightLeg",
-    "mixamorig:RightFoot"
+        "_1:Hips",
+        "_1:Spine",
+        "_1:Spine1",
+        "_1:Neck",
+        "_1:Head",
+        "_1:RightShoulder",
+        "_1:RightArm",
+        "_1:RightForeArm",
+        "_1:RightHand",
+        "_1:LeftShoulder",
+        "_1:LeftArm",
+        "_1:LeftForeArm",
+        "_1:LeftHand",
+        "_1:RightUpLeg",
+        "_1:RightLeg",
+        "_1:RightFoot",
+        "_1:LeftUpLeg",
+        "_1:LeftLeg",
+        "_1:LeftFoot"
     ]
 
     joint_pairs = [
-        ("mixamorig:Hips", "mixamorig:Spine"),
-        ("mixamorig:Spine", "mixamorig:Spine1"),
-        ("mixamorig:Spine1", "mixamorig:Spine2"),
-        ("mixamorig:Spine2", "mixamorig:Neck"),
-        ("mixamorig:Neck", "mixamorig:Head"),
-        ("mixamorig:LeftShoulder", "mixamorig:LeftArm"),
-        ("mixamorig:LeftArm", "mixamorig:LeftForeArm"),
-        ("mixamorig:LeftForeArm", "mixamorig:LeftHand"),
-        ("mixamorig:RightShoulder", "mixamorig:RightArm"),
-        ("mixamorig:RightArm", "mixamorig:RightForeArm"),
-        ("mixamorig:RightForeArm", "mixamorig:RightHand"),
-        ("mixamorig:LeftUpLeg", "mixamorig:LeftLeg"),
-        ("mixamorig:LeftLeg", "mixamorig:LeftFoot"),
-        ("mixamorig:RightUpLeg", "mixamorig:RightLeg"),
-        ("mixamorig:RightLeg", "mixamorig:RightFoot"),
+        ("_1:Hips", "_1:Spine"),
+        ("_1:Spine", "_1:Spine1"),
+        ("_1:Spine1", "_1:Neck"),
+        ("_1:Neck", "_1:Head"),
+        ("_1:RightShoulder", "_1:RightArm"),
+        ("_1:RightArm", "_1:RightForeArm"),
+        ("_1:RightForeArm", "_1:RightHand"),
+        ("_1:LeftShoulder", "_1:LeftArm"),
+        ("_1:LeftArm", "_1:LeftForeArm"),
+        ("_1:LeftForeArm", "_1:LeftHand"),
+        ("_1:RightUpLeg", "_1:RightLeg"),
+        ("_1:RightLeg", "_1:RightFoot"),
+        ("_1:LeftUpLeg", "_1:LeftLeg"),
+        ("_1:LeftLeg", "_1:LeftFoot"),
     ]
+
+    video_path = 'source.mp4'  # Update this with your video file path
+    cap = cv2.VideoCapture(video_path)
+    video_fps = cap.get(cv2.CAP_PROP_FPS)
+    video_frame_duration = int(1000 / video_fps)
 
     data = read_json(json_file_path)
     setup_camera()
@@ -153,7 +156,7 @@ def main():
 
     running = True
     frame_number = 1
-    max_frames = 121
+    max_frames = 664
 
     hand_holds, foot_holds = calculate_holds(data, joints_names, max_frames, initial_hip_height)
 
@@ -161,11 +164,23 @@ def main():
     clock = pygame.time.Clock()
 
     while running:
+        if not cap.isOpened():
+            cap = cv2.VideoCapture(video_path)  # Restart the video if it has ended
+
+        ret, frame = cap.read()
+        if not ret:
+            # Reset the video capture if the video has reached its end
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            continue  # Skip the rest of the loop iteration
+
+        cv2.imshow("Video", frame)
+        cv2.waitKey(video_frame_duration)  # Display each frame for its duration
+
         running, cam_angle_x, cam_angle_y = handle_camera_controls(cam_angle_x, cam_angle_y)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glPushMatrix()
-        glRotatef(cam_angle_x, 1, 0, 0)
-        glRotatef(cam_angle_y - 180, 0, 1, 0)
+        glRotatef(cam_angle_x - 90, 1, 0, 0)
+        glRotatef(cam_angle_y, 0, 1, 0)
 
         # Draw the grid in the background
         draw_grid()
@@ -196,8 +211,10 @@ def main():
         glPopMatrix()
         pygame.display.flip()
         frame_number = (frame_number % max_frames) + 1
-        clock.tick(30)
+        clock.tick(60)
 
+    cap.release()
+    cv2.destroyAllWindows()
     pygame.quit()
 
 

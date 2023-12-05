@@ -4,6 +4,13 @@ import json
 def import_fbx(fbx_path):
     bpy.ops.import_scene.fbx(filepath=fbx_path)
 
+def set_frame_range_from_animation():
+    # Find the max frame from all actions (animations)
+    max_frame = 0
+    for action in bpy.data.actions:
+        max_frame = max(max_frame, action.frame_range[1])
+    bpy.context.scene.frame_end = int(max_frame)  # Convert to integer
+
 def analyze_armature(armature_name):
     data = {}
     armature = bpy.context.scene.objects.get(armature_name)
@@ -20,7 +27,6 @@ def analyze_armature(armature_name):
                 data[bone_name].append({
                     'frame': frame,
                     'position': list(bone.head.xyz),
-                    'rotation': list(bone.rotation_quaternion)
                 })
 
     return data
@@ -44,12 +50,13 @@ def export_to_json(data, file_path):
 
 
 def main():
-    fbx_file_path = '/Users/laurensart/Dropbox/Laurens/Move-One-Import/move-two.fbx'
+    fbx_file_path = '/Users/laurensart/Dropbox/Laurens/Move-One-Import/move-three.fbx'
     output_file_path = '/Users/laurensart/Dropbox/Laurens/Move-One-Import/output.json'
     output_file_path_bones = '/Users/laurensart/Dropbox/Laurens/Move-One-Import/output-bones.json'
     armature_name = "Armature"
 
     import_fbx(fbx_file_path)
+    set_frame_range_from_animation()
     armature_data = analyze_armature(armature_name)
     export_to_json(armature_data, output_file_path)
 
