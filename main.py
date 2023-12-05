@@ -29,6 +29,7 @@ def export_to_json(data, file_path):
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
+
 def main():
     fbx_file_path = '/Users/laurensart/Dropbox/Laurens/Move-One-Import/move-one.fbx'
     output_file_path = '/Users/laurensart/Dropbox/Laurens/Move-One-Import/output.json'
