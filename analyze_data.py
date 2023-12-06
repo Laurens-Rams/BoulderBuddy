@@ -12,7 +12,7 @@ from math import sqrt
 
 # Global scale factor for the joint positions
 SCALE_FACTOR = 0.03
-HIP_TRAIL_LENGTH = 664  # Number of frames to remember and display
+HIP_TRAIL_LENGTH = 1350  # Number of frames to remember and display
 TRAIL_SPHERE_SIZE = 0.01
 SPEED_THRESHOLD = 0.008
 def read_json(file_path):
@@ -156,7 +156,7 @@ def main():
 
     running = True
     frame_number = 1
-    max_frames = 664
+    max_frames = 1550
 
     hand_holds, foot_holds = calculate_holds(data, joints_names, max_frames, initial_hip_height)
 
