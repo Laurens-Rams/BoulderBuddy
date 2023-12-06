@@ -7,8 +7,8 @@ def import_fbx(fbx_path):
 
 def set_frame_range():
     # Set specific frame range
-    bpy.context.scene.frame_start = 100
-    bpy.context.scene.frame_end = 1900
+    bpy.context.scene.frame_start = 5
+    bpy.context.scene.frame_end = 1600
 
 def analyze_armature(armature_name, joints_names):
     data = {}

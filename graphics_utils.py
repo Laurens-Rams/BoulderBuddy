@@ -33,10 +33,10 @@ def draw_grid():
     glEnd()
 
 def setup_camera():
-    display = (800, 600)
+    display = pygame.display.get_surface().get_size()
     pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
     glEnable(GL_DEPTH_TEST)
-    gluPerspective(45, (display[0] / display[1]), 0.5, 50.0)
+    gluPerspective(50, (display[0] / display[1]), 0.5, 50.0)
     glTranslatef(0.0, -3, -10)
 
 def handle_camera_controls(cam_angle_x, cam_angle_y):
