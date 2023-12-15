@@ -218,7 +218,7 @@ def main():
 
     frame_counter = 0
 
-    video_path = 'source.mov'  # Update this with your video file path
+    video_path = 'source.mov' # Update this with your video file path
     cap = cv2.VideoCapture(video_path)
     video_fps = cap.get(cv2.CAP_PROP_FPS)
     video_frame_duration = int(1000 / video_fps)
