@@ -59,7 +59,7 @@ predictions = []
 threshold = 0.5
 
 # Change to your MP4 file path
-video_path = 'MP_Data_Video_Input/Test_1.mp4'
+video_path = 'Test_1.mp4'
 # cap = cv2.VideoCapture(0)
 cap = cv2.VideoCapture(video_path)
 
